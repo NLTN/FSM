@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html>
+
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+        <style>
+            textarea {
+                width: 100%;
+                height: 150px;
+                /* padding: 12px 20px; */
+                box-sizing: border-box;
+                border: 2px solid #ccc;
+                border-radius: 4px;
+                background-color: #f8f8f8;
+                /* font-size: 16px; */
+                resize: none;
+            }
+
+			.rules-state-list {
+				padding: 0px;
+				margin: 0;
+				/* font-size: 16px; */
+				list-style: none;
+				text-align: center;
+			}
+        </style>
+        <script lang="javascript">
+            function crcRemainderSteps(data, divisor) {
+                divisor_len = Math.ceil(Math.log2(divisor));
+                // Add divisor_len - 1 bit to the right of the data block.
+                let r = data << (divisor_len - 1);
+                let r_len = Math.ceil(Math.log2(r));
+                let result = [r];
+
+                while (r_len >= divisor_len) {
+                    r = r ^ (divisor << (r_len - divisor_len));
+                    r_len = Math.ceil(Math.log2(r));
+                    result.push(r);
+                }
+
+                return result;
+            }
+
+            function crcCheckSteps(data, divisor) {
+                divisor_len = Math.ceil(Math.log2(divisor));
+                // Add divisor_len - 1 bit to the right of the data block.
+                let r = data;
+                let r_len = Math.ceil(Math.log2(r));
+                let result = [r];
+
+                while (r_len >= divisor_len) {
+                    r = r ^ (divisor << (r_len - divisor_len));
+                    r_len = Math.ceil(Math.log2(r));
+                    result.push(r);
+                }
+
+                return result;
+            }
+
+            function handleCRCRemainder() {
+                data = parseInt(document.getElementById("data").value, 2);
+                divisor = parseInt(document.getElementById("divisor").value, 2);
+
+                let remainders = crcRemainderSteps(data, divisor);
+                let output = "";
+                output += "Data (decimal): " + data + "<br />";
+                output += "Divisor (decimal): " + divisor + "<br />";
+                output += "<b>--- Remainders ---</b> <br />";
+                pad_len = Math.ceil(Math.log2(remainders[0]));
+                for (const e of remainders) {
+                    output += e.toString(2).padStart(pad_len) + "<br />";
+                }
+
+                // let encodedData = (data << Math.log2(divisor - 1)) + remainders[remainders.length - 1];
+                output += "Data Block + <font color='red'>CRC Bits</font> = " + document.getElementById("data").value;
+                output += "<font color='red'>" + remainders[remainders.length - 1].toString(2).padStart(Math.ceil(Math.log2(divisor)) - 1, '0') + "</font>";
+                document.getElementById("output").innerHTML = output;
+            }
+
+            function handleCRCCheck() {
+                data = parseInt(document.getElementById("data").value, 2);
+                divisor = parseInt(document.getElementById("divisor").value, 2);
+
+                let remainders = crcCheckSteps(data, divisor);
+                let output = "";
+                output += "Data (decimal): " + data + "<br />";
+                output += "Divisor (decimal): " + divisor + "<br />";
+                output += "<b>--- Remainders ---</b> <br />";
+                pad_len = Math.ceil(Math.log2(remainders[0]));
+                for (const e of remainders) {
+                    output += e.toString(2).padStart(pad_len) + "<br />";
+                }
+
+                document.getElementById("output").innerHTML = output;
+            }
+        </script>
+    </head>
+
+    <body>
+        <form id="MainForm" class="w3-container w3-card-4 w3-light-grey w3-text-blue w3-margin">
+            <h3 class="w3-center">Finite State Machine Trace Diagram</h3>
+
+            <div class="w3-row w3-section">
+                <input class="w3-radio" type="radio" name="FSMType" value="DFSM" checked data-click="FSMTypeRadioClicked">
+                <label>DFSM</label>
+                
+                <input class="w3-radio" type="radio" name="FSMType" value="NFSM" data-click="FSMTypeRadioClicked">
+                <label>NFSM</label>
+
+                <input class="w3-radio" type="radio" name="FSMType" value="NFSMwithEpsilon" data-click="FSMTypeRadioClicked">
+                <label>NFSM with Epsilon (ε)</label>
+            </div>
+
+            <div class="w3-row w3-section">
+                <label class="w3-text-blue">
+                    <b>Sigma (Σ)</b>
+                </label>
+                <input name="sigma" type="text" data-keyup="sigmaChanged" data-change="sigmaChanged" class="w3-input w3-border" value="0,1" placeholder="">
+            </div>
+
+            <div class="w3-row w3-section">
+                <label class="w3-text-blue">
+                    <b>States (Q):</b>
+                </label>
+                <input name="states" type="text" data-keyup="statesChanged" data-change="statesChanged" class="w3-input w3-border" placeholder="">
+            </div>
+
+            <div class="w3-row w3-section">
+                <label class="w3-text-blue">
+                    <b>Initial State (q0):</b>
+                </label>
+                <input name="initialState" class="w3-input w3-border" type="text" value="A" placeholder="">
+            </div>
+
+            <div class="w3-row w3-section">
+                <label class="w3-text-blue">
+                    <b>Final States (F):</b>
+                </label>
+                <input name="finalStates" class="w3-input w3-border" type="text" value="B,D" placeholder="">
+            </div>
+
+            <div class="w3-row w3-section">
+                <label class="w3-text-blue">
+                    <b>Input string (ω):</b>
+                </label>
+                <input name="inputString" class="w3-input w3-border" type="text" value="0110" placeholder="">
+            </div>
+
+            <div class="w3-row w3-section">
+                <label class="w3-text-blue">
+                    <b>Transition Table:</b>
+                </label>
+                <br>
+				<div class="w3-row w3-monospace">
+					<div class="w3-col" style="width:30px">&nbsp;</div>
+					<div id="ColNamesArea" class="w3-rest w3-blue" style="padding-left: 3px;"><span>1</span> <span>0</span></div>
+				</div>
+                <div class="w3-row w3-monospace" >
+                    <div class="w3-col w3-blue" style="width:30px">
+                        <ul id="RowNamesArea" class="w3-padding-small rules-state-list">
+                        </ul>
+                    </div>
+                    <div class="w3-rest w3-green">
+                        <textarea name="transitiontable" name="w3review" rows="4" cols="10"></textarea>
+                    </div>
+                </div>
+            </div>
+
+            <div class="w3-row w3-section">
+                <a data-click="traceButtonClicked" class="w3-button w3-block w3-section w3-blue w3-ripple w3-padding">Trace</a>
+            </div>
+
+            <div class="w3-row w3-section w3-right-align" id="output"></div>
+        </form>
+        <script type="module" src="./index.js"></script>
+    </body>
+
+</html>
