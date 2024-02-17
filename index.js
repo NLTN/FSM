@@ -74,12 +74,21 @@ function showConfirmBox(title, message, dataset) {
 }
 
 function traceDFSM(inputString, initialState, finalStates, trasitionTable) {
-    var currentState = initialState;
+    let currentState = initialState;
     const path = [currentState];
 
-    for (var i = 0; i < inputString.length; ++ i) {
+    let i = 0;
+    let done = false;
+    while (i < inputString.length && !done) {
         currentState = trasitionTable[currentState][inputString[i]];
+
+        if (!currentState) {
+            currentState = "NULL";
+            done = true;
+        }
+        
         path.push(currentState);
+        ++i;
     }
 
     const outputElem = document.getElementById("output");
